@@ -26,7 +26,7 @@ Shortcuts to key information for individual products can be found here:
 - Calculations
 - Psychrometer
 - Installation of psychrometer chambers
-- Stem
+- [Stem](Products/Psychrometer/PSY1.md)
 - Leaf
 - Osmotic Potential
 - Calibration
