@@ -1,6 +1,4 @@
 {
-  "$schema": "https://dotnet.github.io/docfx/schemas/v2.0.json",
-  
   "build": {
     "content": [
       {
@@ -8,7 +6,7 @@
         "exclude": ["_site/**", "obj/**"]
       }
     ],
-    "resource": [
+        "resource": [
       {
         "files": ["images/**"]
       }
@@ -38,6 +36,7 @@
         "path": ""
       },
       "pdf": true,
+      "pdfFileName": "ICT Product Support Documentation.pdf",
       "_appFooter": "<div style='width: 100%; text-align: center;'><span>Copyright © 2026 ICT International</span></div>"
     }
   }

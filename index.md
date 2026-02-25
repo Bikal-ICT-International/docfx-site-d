@@ -1,6 +1,6 @@
 # ICT International Document Library
 
-All support resources for ICT International will be found here, categorised by product. 
+All support resources for ICT International will be found here, categorised by product.
 
 The estimate of the launch for this new site is April 2026.
 
@@ -20,13 +20,13 @@ Shortcuts to key information for individual products can be found here:
 - Sap Flow Measurement:
 - Installation of Sap Flow needles
 - Configuration:
-- SFM1 Sap Flow Meter
-- SFMx Sap Flow Meter with IoT connectivity
+- [SFM1 Sap Flow Meter](Products/SFM1.md)
+- [SFMx Sap Flow Meter with IoT connectivity](Products/SFM1X.md)
 - SFS Sap Flow Sensor
 - Calculations
-- Psychrometer
+- [Psychrometer](Products/Psychrometer/PSY1.md)
 - Installation of psychrometer chambers
-- [Stem](Products/Psychrometer/PSY1.md)
+- Stem
 - Leaf
 - Osmotic Potential
 - Calibration
