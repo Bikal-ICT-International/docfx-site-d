@@ -22,7 +22,7 @@ Shortcuts to key information for individual products can be found here:
 - Configuration:
 - [SFM1 Sap Flow Meter](Products/SFM1.md)
 - [SFMx Sap Flow Meter with IoT connectivity](Products/SFM1X.md)
-- SFS Sap Flow Sensor
+- [SFS Sap Flow Sensor](Products/sapflowsensor.md)
 - Calculations
 - [Psychrometer](Products/Psychrometer/PSY1.md)
 - Installation of psychrometer chambers
