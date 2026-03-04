@@ -45,7 +45,7 @@ The AD-Node is an Internet of Things (IoT) node that is used for the measurement
 - 2x single ended voltage inputs
 - 1x 4-20mA input
 - 2x Thermistor Input
-- 4x Digital Inputs
+- 4x Digital Input
 
 With LoRaWAN connectivity, the AD-Node is ideal for a low-power IoT node is needed for analogue sensors.
 
