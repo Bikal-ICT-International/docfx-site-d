@@ -4,6 +4,8 @@
       href: Nodes/ADNode.md
     - name: S Node
       href: Nodes/SNode.md
+    - name: MFR Node
+      href: Nodes/MFRNode.md
 
 - name: Psychrometer Documentation
   items:
