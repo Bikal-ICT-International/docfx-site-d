@@ -39,3 +39,7 @@ launchSettings.json
 *.nuget.targets
 *.code-workspace
 *.binlog
+
+# Local deploy helpers
+deploy-gh-pages.ps1
+deploy-main-no-site.ps1
