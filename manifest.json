@@ -1,5 +1,5 @@
 {
-  "source_base_path": "F:/docfx-site-d",
+  "source_base_path": "/home/runner/work/docfx-site-d/docfx-site-d",
   "xrefmap": "xrefmap.yml",
   "files": [
     {
@@ -169,86 +169,6 @@
       "output": {
         ".html": {
           "relative_path": "index.html"
-        }
-      },
-      "version": ""
-    },
-    {
-      "type": "Resource",
-      "source_relative_path": "pdf/Products/Nodes/ADNode.pdf",
-      "output": {
-        "resource": {
-          "relative_path": "pdf/Products/Nodes/ADNode.pdf"
-        }
-      },
-      "version": ""
-    },
-    {
-      "type": "Resource",
-      "source_relative_path": "pdf/Products/Nodes/SNode.pdf",
-      "output": {
-        "resource": {
-          "relative_path": "pdf/Products/Nodes/SNode.pdf"
-        }
-      },
-      "version": ""
-    },
-    {
-      "type": "Resource",
-      "source_relative_path": "pdf/Products/Psychrometer/PSY1.pdf",
-      "output": {
-        "resource": {
-          "relative_path": "pdf/Products/Psychrometer/PSY1.pdf"
-        }
-      },
-      "version": ""
-    },
-    {
-      "type": "Resource",
-      "source_relative_path": "pdf/Products/Psychrometer/PSY1x.pdf",
-      "output": {
-        "resource": {
-          "relative_path": "pdf/Products/Psychrometer/PSY1x.pdf"
-        }
-      },
-      "version": ""
-    },
-    {
-      "type": "Resource",
-      "source_relative_path": "pdf/Products/SFM1.pdf",
-      "output": {
-        "resource": {
-          "relative_path": "pdf/Products/SFM1.pdf"
-        }
-      },
-      "version": ""
-    },
-    {
-      "type": "Resource",
-      "source_relative_path": "pdf/Products/SFM1X.pdf",
-      "output": {
-        "resource": {
-          "relative_path": "pdf/Products/SFM1X.pdf"
-        }
-      },
-      "version": ""
-    },
-    {
-      "type": "Resource",
-      "source_relative_path": "pdf/Products/dnp.pdf",
-      "output": {
-        "resource": {
-          "relative_path": "pdf/Products/dnp.pdf"
-        }
-      },
-      "version": ""
-    },
-    {
-      "type": "Resource",
-      "source_relative_path": "pdf/Products/sapflowsensor.pdf",
-      "output": {
-        "resource": {
-          "relative_path": "pdf/Products/sapflowsensor.pdf"
         }
       },
       "version": ""
