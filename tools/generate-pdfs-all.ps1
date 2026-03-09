@@ -452,12 +452,12 @@ function Insert-PdfLink {
 
     $htmlText = Get-Content -Path $HtmlPath -Raw
 
-    $iconSvg = "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='32' height='32' aria-hidden='true'><path fill='#1f2937' d='M6 2h9l5 5v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z'/><path fill='#d32f2f' d='M15 2v5h5zM4 14h16v6H4z'/><path fill='#fff' d='M6.4 18.5h.9c.7 0 1.1-.3 1.1-.9 0-.6-.4-.9-1.1-.9h-.9v1.8zm0 .8V21H5.3v-5h2.1c1.3 0 2.1.6 2.1 1.7S8.7 19.4 7.4 19.4h-1zm4.7.8h-1.8v-5h1.8c1.5 0 2.5.9 2.5 2.5s-1 2.5-2.5 2.5zm-.7-.9h.6c.8 0 1.4-.5 1.4-1.6s-.6-1.6-1.4-1.6h-.6zm4 .9h-1.1v-5h3.1v.9h-2v1.2h1.8v.9h-1.8z'/></svg>"
+    $iconSvg = "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='24' height='24' aria-hidden='true'><path fill='#fff' d='M6 2h9l5 5v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z'/><path fill='#d32f2f' d='M15 2v5h5zM4 14h16v6H4z'/><path fill='#fff' d='M6.4 18.5h.9c.7 0 1.1-.3 1.1-.9 0-.6-.4-.9-1.1-.9h-.9v1.8zm0 .8V21H5.3v-5h2.1c1.3 0 2.1.6 2.1 1.7S8.7 19.4 7.4 19.4h-1zm4.7.8h-1.8v-5h1.8c1.5 0 2.5.9 2.5 2.5s-1 2.5-2.5 2.5zm-.7-.9h.6c.8 0 1.4-.5 1.4-1.6s-.6-1.6-1.4-1.6h-.6zm4 .9h-1.1v-5h3.1v.9h-2v1.2h1.8v.9h-1.8z'/></svg>"
     $iconData = "data:image/svg+xml,{0}" -f [System.Uri]::EscapeDataString($iconSvg)
     $linkHtml = [Environment]::NewLine +
         "<p class=""pdf-download"" style=""margin:12px 0 20px;"">" +
         "<a class=""pdf-download-btn"" href=""$RelativePdfPath"" download style=""display:inline-flex;align-items:center;gap:10px;padding:8px 14px;border:1px solid #355c86;border-radius:6px;background:#4f79a8;color:#ffffff;text-decoration:none;font-weight:700;transition:background-color .2s ease,border-color .2s ease,color .2s ease;"" onmouseover=""this.style.background='#2f5e91';this.style.borderColor='#244d78';this.style.color='#ffffff';"" onmouseout=""this.style.background='#4f79a8';this.style.borderColor='#355c86';this.style.color='#ffffff';"">" +
-        "<img src=""$iconData"" alt="""" width=""32"" height=""32"" style=""display:block;"" />" +
+        "<img src=""$iconData"" alt="""" width=""24"" height=""24"" style=""display:block;"" />" +
         "<span>Download PDF</span>" +
         "</a></p>" +
         [Environment]::NewLine
@@ -514,6 +514,106 @@ function Inject-PdfLinks {
     }
 }
 
+function Get-CombinedPdfFileName {
+    param([string]$Root)
+
+    $defaultName = "ICT Product Support Handbook.pdf"
+    $docfxPath = Join-Path $Root "docfx.json"
+    if (-not (Test-Path $docfxPath)) {
+        return $defaultName
+    }
+
+    try {
+        $docfx = Get-Content -Path $docfxPath -Raw | ConvertFrom-Json
+        $name = $docfx.build.globalMetadata.pdfFileName
+        if (-not [string]::IsNullOrWhiteSpace($name)) {
+            return [string]$name
+        }
+    }
+    catch {
+    }
+
+    return $defaultName
+}
+
+function Create-CombinedPdf {
+    param(
+        [string]$Root,
+        [string]$SiteRoot,
+        [System.IO.FileInfo[]]$MarkdownFiles
+    )
+
+    Ensure-PythonModule -ModuleName "pypdf"
+
+    $pdfRoot = Join-Path $SiteRoot "pdf"
+    if (-not (Test-Path $pdfRoot)) {
+        return
+    }
+
+    $combinedName = Get-CombinedPdfFileName -Root $Root
+    $combinedPath = Join-Path $pdfRoot $combinedName
+
+    $inputPdfs = New-Object System.Collections.Generic.List[string]
+    foreach ($md in $MarkdownFiles) {
+        $relativeMd = Get-RelativePath -BasePath $Root -TargetPath $md.FullName
+        $relativePdf = [System.IO.Path]::ChangeExtension($relativeMd, ".pdf")
+        $pdfPath = Join-Path $pdfRoot $relativePdf
+        if (Test-Path $pdfPath) {
+            [void]$inputPdfs.Add($pdfPath)
+        }
+    }
+
+    if ($inputPdfs.Count -eq 0) {
+        return
+    }
+
+    $listPath = [System.IO.Path]::GetTempFileName()
+    try {
+        Set-Content -Path $listPath -Value $inputPdfs -Encoding UTF8
+
+        $script = @"
+import os
+import sys
+from pypdf import PdfReader, PdfWriter
+
+list_path = sys.argv[1]
+out_path = sys.argv[2]
+
+writer = PdfWriter()
+with open(list_path, "r", encoding="utf-8") as f:
+    for line in f:
+        p = line.strip()
+        if p and os.path.exists(p):
+            reader = PdfReader(p)
+            for page in reader.pages:
+                writer.add_page(page)
+
+with open(out_path, "wb") as out:
+    writer.write(out)
+"@
+
+        $script | python - $listPath $combinedPath
+        if ($LASTEXITCODE -ne 0 -or -not (Test-Path $combinedPath)) {
+            throw "Failed to create combined PDF: $combinedPath"
+        }
+
+        $targets = @(
+            (Join-Path $SiteRoot $combinedName),
+            (Join-Path (Join-Path $SiteRoot "Products") $combinedName)
+        )
+
+        foreach ($target in $targets) {
+            Copy-Item -Path $combinedPath -Destination $target -Force
+        }
+
+        Write-Host "Created combined PDF: $(Normalize-RelativePath (Get-RelativePath -BasePath $SiteRoot -TargetPath $combinedPath))"
+    }
+    finally {
+        if (Test-Path $listPath) {
+            Remove-Item -Path $listPath -Force
+        }
+    }
+}
 $repoRoot = Get-RepoRoot
 $siteRoot = Join-Path $repoRoot "_site"
 $markdownFiles = Get-MarkdownFiles -Root $repoRoot
@@ -525,6 +625,7 @@ if (-not $SkipBuild) {
 
 if (-not $SkipPdf) {
     Convert-HtmlToPdf -Root $repoRoot -SiteRoot $siteRoot -MarkdownFiles $markdownFiles -ReleaseInfo $releaseInfo
+    Create-CombinedPdf -Root $repoRoot -SiteRoot $siteRoot -MarkdownFiles $markdownFiles
 }
 
 if (-not $SkipInject) {
@@ -532,6 +633,12 @@ if (-not $SkipInject) {
 }
 
 Write-Host "Done."
+
+
+
+
+
+
 
 
 
