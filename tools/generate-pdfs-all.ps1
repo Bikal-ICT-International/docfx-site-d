@@ -1,4 +1,4 @@
-param(
+﻿param(
     [switch]$SkipPdf,
     [switch]$SkipBuild,
     [switch]$SkipInject
@@ -413,10 +413,11 @@ function Convert-HtmlToPdf {
             $urlPath = ConvertTo-RelativePath $relativeHtml
             $url = "http://127.0.0.1:$($server.Port)/$urlPath"
             Write-Host "Rendering browser PDF: $(ConvertTo-RelativePath $relativeHtml)"
-
             $chromeArgs = @(
                 "--headless=new",
                 "--disable-gpu",
+                "--disable-dev-shm-usage",
+                "--no-sandbox",
                 "--run-all-compositor-stages-before-draw",
                 "--virtual-time-budget=10000",
                 "--print-to-pdf=$pdfOutputPath",
@@ -429,7 +430,13 @@ function Convert-HtmlToPdf {
 
             try {
                 & $browserExe @chromeArgs | Out-Null
-                if (-not (Test-Path $pdfOutputPath)) {
+                if ($LASTEXITCODE -ne 0 -or -not (Test-Path $pdfOutputPath)) {
+                    # Retry with legacy headless flag for older/variant Chromium builds.
+                    $fallbackArgs = @($chromeArgs)
+                    $fallbackArgs[0] = "--headless"
+                    & $browserExe @fallbackArgs | Out-Null
+                }
+                if ($LASTEXITCODE -ne 0 -or -not (Test-Path $pdfOutputPath)) {
                     throw "PDF rendering failed for $relativeHtml"
                 }
                 Add-PdfPageNumbers -PdfPath $pdfOutputPath

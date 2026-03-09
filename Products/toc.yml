@@ -1,4 +1,4 @@
-- name: Node Documentation
+﻿- name: Node Documentation
   items:
     - name: AD Node
       href: Nodes/ADNode.md
@@ -21,9 +21,10 @@
     - name: SFM1 Sap Flow Meter
       href: SFM1.md
     - name: SFMx Sap Flow Meter
-      href: SFM1x.md
+      href: SFM1X.md
 
 - name: Datalogger/Node Platform Documentation
   items:
     - name: Datalogger/Node Platform (DNP)
       href: dnp.md
+
