@@ -181,7 +181,18 @@ function Start-StaticServer {
     Get-RequiredCommand -CommandName "python"
 
     $pythonArgs = @("-m", "http.server", $Port, "--bind", "127.0.0.1", "--directory", $SiteRoot)
-    $process = Start-Process -FilePath "python" -ArgumentList $pythonArgs -PassThru -WindowStyle Hidden
+    $startProcessParams = @{
+        FilePath = "python"
+        ArgumentList = $pythonArgs
+        PassThru = $true
+    }
+
+    $isWindowsHost = ($PSVersionTable.PSEdition -eq "Desktop") -or ($env:OS -eq "Windows_NT")
+    if ($isWindowsHost) {
+        $startProcessParams.WindowStyle = "Hidden"
+    }
+
+    $process = Start-Process @startProcessParams
 
     for ($i = 0; $i -lt 40; $i++) {
         Start-Sleep -Milliseconds 250
