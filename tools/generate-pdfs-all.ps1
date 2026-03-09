@@ -418,6 +418,11 @@ function Convert-HtmlToPdf {
                 "--disable-gpu",
                 "--disable-dev-shm-usage",
                 "--no-sandbox",
+                "--no-first-run",
+                "--no-default-browser-check",
+                "--disable-background-networking",
+                "--disable-component-update",
+                "--disable-sync",
                 "--run-all-compositor-stages-before-draw",
                 "--virtual-time-budget=10000",
                 "--print-to-pdf=$pdfOutputPath",
@@ -429,14 +434,16 @@ function Convert-HtmlToPdf {
             )
 
             try {
-                & $browserExe @chromeArgs | Out-Null
-                if ($LASTEXITCODE -ne 0 -or -not (Test-Path $pdfOutputPath)) {
+                & $browserExe @chromeArgs 2>$null | Out-Null
+                $browserExitCode = $LASTEXITCODE
+                if ($browserExitCode -ne 0 -or -not (Test-Path $pdfOutputPath)) {
                     # Retry with legacy headless flag for older/variant Chromium builds.
                     $fallbackArgs = @($chromeArgs)
                     $fallbackArgs[0] = "--headless"
-                    & $browserExe @fallbackArgs | Out-Null
+                    & $browserExe @fallbackArgs 2>$null | Out-Null
+                    $browserExitCode = $LASTEXITCODE
                 }
-                if ($LASTEXITCODE -ne 0 -or -not (Test-Path $pdfOutputPath)) {
+                if ($browserExitCode -ne 0 -or -not (Test-Path $pdfOutputPath)) {
                     throw "PDF rendering failed for $relativeHtml"
                 }
                 Add-PdfPageNumbers -PdfPath $pdfOutputPath
