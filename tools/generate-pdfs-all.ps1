@@ -223,9 +223,16 @@ function Invoke-BrowserWithTimeout {
     )
 
     $proc = Start-Process -FilePath $BrowserExe -ArgumentList $Arguments -PassThru
-    $completed = $proc | Wait-Process -Timeout $TimeoutSeconds -ErrorAction SilentlyContinue
+    $timedOut = $false
 
-    if (-not $completed) {
+    try {
+        Wait-Process -Id $proc.Id -Timeout $TimeoutSeconds -ErrorAction Stop
+    }
+    catch {
+        $timedOut = $true
+    }
+
+    if ($timedOut) {
         try {
             Stop-Process -Id $proc.Id -Force
         }
@@ -691,6 +698,7 @@ if (-not $SkipInject) {
 }
 
 Write-Host "Done."
+
 
 
 
