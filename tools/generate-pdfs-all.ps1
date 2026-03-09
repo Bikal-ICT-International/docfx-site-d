@@ -215,6 +215,35 @@ function Start-StaticServer {
     throw "Failed to start local static server for PDF rendering."
 }
 
+function Invoke-BrowserWithTimeout {
+    param(
+        [string]$BrowserExe,
+        [string[]]$Arguments,
+        [int]$TimeoutSeconds = 120
+    )
+
+    $proc = Start-Process -FilePath $BrowserExe -ArgumentList $Arguments -PassThru
+    $completed = $proc | Wait-Process -Timeout $TimeoutSeconds -ErrorAction SilentlyContinue
+
+    if (-not $completed) {
+        try {
+            Stop-Process -Id $proc.Id -Force
+        }
+        catch {
+        }
+
+        return [PSCustomObject]@{
+            ExitCode = -1
+            TimedOut = $true
+        }
+    }
+
+    return [PSCustomObject]@{
+        ExitCode = $proc.ExitCode
+        TimedOut = $false
+    }
+}
+
 function Set-PdfOpenWithOutlinePane {
     param([string]$PdfPath)
 
@@ -434,17 +463,18 @@ function Convert-HtmlToPdf {
             )
 
             try {
-                & $browserExe @chromeArgs 2>$null | Out-Null
-                $browserExitCode = $LASTEXITCODE
+                $renderResult = Invoke-BrowserWithTimeout -BrowserExe $browserExe -Arguments $chromeArgs -TimeoutSeconds 120
+                $browserExitCode = $renderResult.ExitCode
                 if ($browserExitCode -ne 0 -or -not (Test-Path $pdfOutputPath)) {
                     # Retry with legacy headless flag for older/variant Chromium builds.
                     $fallbackArgs = @($chromeArgs)
                     $fallbackArgs[0] = "--headless"
-                    & $browserExe @fallbackArgs 2>$null | Out-Null
-                    $browserExitCode = $LASTEXITCODE
+                    $renderResult = Invoke-BrowserWithTimeout -BrowserExe $browserExe -Arguments $fallbackArgs -TimeoutSeconds 120
+                    $browserExitCode = $renderResult.ExitCode
                 }
                 if ($browserExitCode -ne 0 -or -not (Test-Path $pdfOutputPath)) {
-                    throw "PDF rendering failed for $relativeHtml"
+                    $reason = if ($renderResult.TimedOut) { "timeout" } else { "exit code $browserExitCode" }
+                    throw "PDF rendering failed for $relativeHtml ($reason)"
                 }
                 Add-PdfPageNumbers -PdfPath $pdfOutputPath
                 Set-PdfOpenWithOutlinePane -PdfPath $pdfOutputPath
