@@ -1,0 +1,195 @@
+{
+  "source_base_path": "F:/docfx-site-d",
+  "xrefmap": "xrefmap.yml",
+  "files": [
+    {
+      "type": "Resource",
+      "output": {
+        "resource": {
+          "relative_path": "index.json"
+        }
+      }
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "Products/Nodes/ADNode.md",
+      "output": {
+        ".html": {
+          "relative_path": "Products/Nodes/ADNode.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "Products/Nodes/MFRNode.md",
+      "output": {
+        ".html": {
+          "relative_path": "Products/Nodes/MFRNode.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "Products/Nodes/SNode.md",
+      "output": {
+        ".html": {
+          "relative_path": "Products/Nodes/SNode.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "Products/Psychrometer/PSY1.md",
+      "output": {
+        ".html": {
+          "relative_path": "Products/Psychrometer/PSY1.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "Products/Psychrometer/PSY1x.md",
+      "output": {
+        ".html": {
+          "relative_path": "Products/Psychrometer/PSY1x.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "Products/SFM1.md",
+      "output": {
+        ".html": {
+          "relative_path": "Products/SFM1.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "Products/SFM1X.md",
+      "output": {
+        ".html": {
+          "relative_path": "Products/SFM1X.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "Products/dnp.md",
+      "output": {
+        ".html": {
+          "relative_path": "Products/dnp.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "Products/sapflowsensor.md",
+      "output": {
+        ".html": {
+          "relative_path": "Products/sapflowsensor.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Toc",
+      "source_relative_path": "Products/toc.yml",
+      "output": {
+        ".html": {
+          "relative_path": "Products/toc.html"
+        },
+        ".json": {
+          "relative_path": "Products/toc.json"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "images/ICT-Office.jpg",
+      "output": {
+        "resource": {
+          "relative_path": "images/ICT-Office.jpg"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "images/favicon.ico",
+      "output": {
+        "resource": {
+          "relative_path": "images/favicon.ico"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "images/iotnode.jpg",
+      "output": {
+        "resource": {
+          "relative_path": "images/iotnode.jpg"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "images/logo.svg",
+      "output": {
+        "resource": {
+          "relative_path": "images/logo.svg"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "images/sapflow.jpg",
+      "output": {
+        "resource": {
+          "relative_path": "images/sapflow.jpg"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "index.md",
+      "output": {
+        ".html": {
+          "relative_path": "index.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Toc",
+      "source_relative_path": "toc.yml",
+      "output": {
+        ".html": {
+          "relative_path": "toc.html"
+        },
+        ".json": {
+          "relative_path": "toc.json"
+        }
+      },
+      "version": ""
+    }
+  ],
+  "groups": [
+    {
+      "xrefmap": "xrefmap.yml"
+    }
+  ]
+}
