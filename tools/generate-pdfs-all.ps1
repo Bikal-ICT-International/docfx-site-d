@@ -222,25 +222,30 @@ function Invoke-BrowserWithTimeout {
         [int]$TimeoutSeconds = 120
     )
 
-    $proc = Start-Process -FilePath $BrowserExe -ArgumentList $Arguments -PassThru
-    $completed = $proc | Wait-Process -Timeout $TimeoutSeconds -ErrorAction SilentlyContinue
+    $stdoutPath = [System.IO.Path]::GetTempFileName()
+    $stderrPath = [System.IO.Path]::GetTempFileName()
 
-    if (-not $completed) {
+    try {
+        $proc = Start-Process -FilePath $BrowserExe -ArgumentList $Arguments -PassThru -RedirectStandardOutput $stdoutPath -RedirectStandardError $stderrPath
+        $timedOut = $false
+
         try {
-            Stop-Process -Id $proc.Id -Force
+            Wait-Process -Id $proc.Id -Timeout $TimeoutSeconds -ErrorAction Stop
         }
         catch {
+            $timedOut = $true
         }
 
-        return [PSCustomObject]@{
-            ExitCode = -1
-            TimedOut = $true
+        if ($timedOut) {
+            try { Stop-Process -Id $proc.Id -Force } catch {}
+            return [PSCustomObject]@{ ExitCode = -1; TimedOut = $true }
         }
+
+        return [PSCustomObject]@{ ExitCode = $proc.ExitCode; TimedOut = $false }
     }
-
-    return [PSCustomObject]@{
-        ExitCode = $proc.ExitCode
-        TimedOut = $false
+    finally {
+        if (Test-Path $stdoutPath) { Remove-Item -Path $stdoutPath -Force -ErrorAction SilentlyContinue }
+        if (Test-Path $stderrPath) { Remove-Item -Path $stderrPath -Force -ErrorAction SilentlyContinue }
     }
 }
 
@@ -337,6 +342,7 @@ function Convert-HtmlToPdf {
         New-Item -ItemType Directory -Path $pdfRoot -Force | Out-Null
     }
 
+    $failedPdfPages = New-Object System.Collections.Generic.List[string]
     $server = Start-StaticServer -SiteRoot $SiteRoot
     try {
         foreach ($md in $MarkdownFiles) {
@@ -442,6 +448,7 @@ function Convert-HtmlToPdf {
             $urlPath = ConvertTo-RelativePath $relativeHtml
             $url = "http://127.0.0.1:$($server.Port)/$urlPath"
             Write-Host "Rendering browser PDF: $(ConvertTo-RelativePath $relativeHtml)"
+
             $chromeArgs = @(
                 "--headless=new",
                 "--disable-gpu",
@@ -463,24 +470,39 @@ function Convert-HtmlToPdf {
             )
 
             try {
-                $renderResult = Invoke-BrowserWithTimeout -BrowserExe $browserExe -Arguments $chromeArgs -TimeoutSeconds 120
+                $renderResult = Invoke-BrowserWithTimeout -BrowserExe $browserExe -Arguments $chromeArgs -TimeoutSeconds 180
                 $browserExitCode = $renderResult.ExitCode
-                if ($browserExitCode -ne 0 -or -not (Test-Path $pdfOutputPath)) {
-                    # Retry with legacy headless flag for older/variant Chromium builds.
+                $pdfReady = (Test-Path $pdfOutputPath) -and ((Get-Item $pdfOutputPath).Length -gt 0)
+
+                if (-not $pdfReady) {
                     $fallbackArgs = @($chromeArgs)
                     $fallbackArgs[0] = "--headless"
-                    $renderResult = Invoke-BrowserWithTimeout -BrowserExe $browserExe -Arguments $fallbackArgs -TimeoutSeconds 120
+                    $renderResult = Invoke-BrowserWithTimeout -BrowserExe $browserExe -Arguments $fallbackArgs -TimeoutSeconds 180
                     $browserExitCode = $renderResult.ExitCode
+                    $pdfReady = (Test-Path $pdfOutputPath) -and ((Get-Item $pdfOutputPath).Length -gt 0)
                 }
-                if ($browserExitCode -ne 0 -or -not (Test-Path $pdfOutputPath)) {
+
+                if (-not $pdfReady) {
                     $reason = if ($renderResult.TimedOut) { "timeout" } else { "exit code $browserExitCode" }
                     throw "PDF rendering failed for $relativeHtml ($reason)"
                 }
+
                 Add-PdfPageNumbers -PdfPath $pdfOutputPath
                 Set-PdfOpenWithOutlinePane -PdfPath $pdfOutputPath
             }
+            catch {
+                [void]$failedPdfPages.Add("${relativeHtml} :: $($_.Exception.Message)")
+                Write-Warning "Skipping PDF for ${relativeHtml}: $($_.Exception.Message)"
+            }
             finally {
                 Set-Content -Path $htmlPath -Value $originalHtml -Encoding UTF8
+            }
+        }
+
+        if ($failedPdfPages.Count -gt 0) {
+            Write-Warning "PDF generation skipped for $($failedPdfPages.Count) page(s)."
+            foreach ($item in $failedPdfPages) {
+                Write-Warning $item
             }
         }
     }
@@ -691,6 +713,7 @@ if (-not $SkipInject) {
 }
 
 Write-Host "Done."
+
 
 
 
