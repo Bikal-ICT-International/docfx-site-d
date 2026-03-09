@@ -361,7 +361,6 @@ function Convert-HtmlToPdf {
     }
 
     .pdf-cover-logo { width: 140px; height: auto; margin-bottom: 10px; }
-    .pdf-cover-ict { color: #C4A484; font-size: 34px; font-weight: 700; letter-spacing: 3px; margin-bottom: 28px; }
     .pdf-cover h1 { margin: 0 0 12px; font-size: 30px; }
     .pdf-cover h2 { margin: 0 0 24px; font-size: 22px; font-weight: 600; }
     .pdf-cover .pdf-cover-meta { font-size: 13px; line-height: 1.8; }
@@ -382,7 +381,6 @@ function Convert-HtmlToPdf {
             $coverHtml = @"
 <div class="pdf-cover">
   <img class="pdf-cover-logo" src="/images/logo.svg" alt="ICT logo" />
-  <div class="pdf-cover-ict">ICT</div>
   <h1>ICT International</h1>
   <h2>Product Support Documentation</h2>
   <div class="pdf-cover-meta">
@@ -454,12 +452,12 @@ function Insert-PdfLink {
 
     $htmlText = Get-Content -Path $HtmlPath -Raw
 
-    $iconSvg = "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='16' height='16' aria-hidden='true'><path fill='#1f2937' d='M6 2h9l5 5v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z'/><path fill='#d32f2f' d='M15 2v5h5zM4 14h16v6H4z'/><path fill='#fff' d='M6.4 18.5h.9c.7 0 1.1-.3 1.1-.9 0-.6-.4-.9-1.1-.9h-.9v1.8zm0 .8V21H5.3v-5h2.1c1.3 0 2.1.6 2.1 1.7S8.7 19.4 7.4 19.4h-1zm4.7.8h-1.8v-5h1.8c1.5 0 2.5.9 2.5 2.5s-1 2.5-2.5 2.5zm-.7-.9h.6c.8 0 1.4-.5 1.4-1.6s-.6-1.6-1.4-1.6h-.6zm4 .9h-1.1v-5h3.1v.9h-2v1.2h1.8v.9h-1.8z'/></svg>"
+    $iconSvg = "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='32' height='32' aria-hidden='true'><path fill='#1f2937' d='M6 2h9l5 5v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z'/><path fill='#d32f2f' d='M15 2v5h5zM4 14h16v6H4z'/><path fill='#fff' d='M6.4 18.5h.9c.7 0 1.1-.3 1.1-.9 0-.6-.4-.9-1.1-.9h-.9v1.8zm0 .8V21H5.3v-5h2.1c1.3 0 2.1.6 2.1 1.7S8.7 19.4 7.4 19.4h-1zm4.7.8h-1.8v-5h1.8c1.5 0 2.5.9 2.5 2.5s-1 2.5-2.5 2.5zm-.7-.9h.6c.8 0 1.4-.5 1.4-1.6s-.6-1.6-1.4-1.6h-.6zm4 .9h-1.1v-5h3.1v.9h-2v1.2h1.8v.9h-1.8z'/></svg>"
     $iconData = "data:image/svg+xml,{0}" -f [System.Uri]::EscapeDataString($iconSvg)
     $linkHtml = [Environment]::NewLine +
         "<p class=""pdf-download"" style=""margin:12px 0 20px;"">" +
-        "<a class=""pdf-download-btn"" href=""$RelativePdfPath"" download style=""display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border:1px solid #c7cdd4;border-radius:6px;background:#e5e7eb;color:#1f2937;text-decoration:none;font-weight:600;"">" +
-        "<img src=""$iconData"" alt="""" width=""16"" height=""16"" style=""display:block;"" />" +
+        "<a class=""pdf-download-btn"" href=""$RelativePdfPath"" download style=""display:inline-flex;align-items:center;gap:10px;padding:8px 14px;border:1px solid #355c86;border-radius:6px;background:#4f79a8;color:#ffffff;text-decoration:none;font-weight:700;transition:background-color .2s ease,border-color .2s ease,color .2s ease;"" onmouseover=""this.style.background='#2f5e91';this.style.borderColor='#244d78';this.style.color='#ffffff';"" onmouseout=""this.style.background='#4f79a8';this.style.borderColor='#355c86';this.style.color='#ffffff';"">" +
+        "<img src=""$iconData"" alt="""" width=""32"" height=""32"" style=""display:block;"" />" +
         "<span>Download PDF</span>" +
         "</a></p>" +
         [Environment]::NewLine
@@ -534,3 +532,8 @@ if (-not $SkipInject) {
 }
 
 Write-Host "Done."
+
+
+
+
+
