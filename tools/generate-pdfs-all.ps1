@@ -14,7 +14,7 @@ function Get-RepoRoot {
     return $scriptDir
 }
 
-function Normalize-RelativePath {
+function ConvertTo-RelativePath {
     param([string]$Path)
     return ($Path -replace "\\", "/")
 }
@@ -38,7 +38,7 @@ function Get-RelativePath {
     return [System.Uri]::UnescapeDataString($relativeUri.ToString()) -replace "/", "\"
 }
 
-function Ensure-Command {
+function Get-RequiredCommand {
     param([string]$CommandName)
     $command = Get-Command $CommandName -ErrorAction SilentlyContinue
     if (-not $command) {
@@ -105,7 +105,7 @@ function Get-ReleaseInfo {
     $state = $null
 
     if (Test-Path $statePath) {
-        $raw = Get-Content -Path $statePath -Raw
+        $raw = Get-Content -Path $statePath -Raw -Encoding UTF8
         if (-not [string]::IsNullOrWhiteSpace($raw)) {
             $state = $raw | ConvertFrom-Json
         }
@@ -143,7 +143,7 @@ function Get-ReleaseInfo {
 function Invoke-DocFxBuild {
     param([string]$Root)
 
-    Ensure-Command -CommandName "docfx"
+    Get-RequiredCommand -CommandName "docfx"
     Write-Host "Building site with DocFX..."
     Push-Location $Root
     try {
@@ -178,7 +178,7 @@ function Start-StaticServer {
         [int]$Port = 8765
     )
 
-    Ensure-Command -CommandName "python"
+    Get-RequiredCommand -CommandName "python"
 
     $pythonArgs = @("-m", "http.server", $Port, "--bind", "127.0.0.1", "--directory", $SiteRoot)
     $process = Start-Process -FilePath "python" -ArgumentList $pythonArgs -PassThru -WindowStyle Hidden
@@ -225,7 +225,7 @@ function Set-PdfOpenWithOutlinePane {
     }
 }
 
-function Ensure-PythonModule {
+function Install-PythonModuleIfMissing {
     param([string]$ModuleName)
 
     $check = "import importlib.util,sys; sys.exit(0 if importlib.util.find_spec('$ModuleName') else 1)"
@@ -255,8 +255,9 @@ from reportlab.pdfgen import canvas
 pdf_path = sys.argv[1]
 reader = PdfReader(pdf_path)
 writer = PdfWriter()
+writer.clone_document_from_reader(reader)
 
-for idx, page in enumerate(reader.pages):
+for idx, page in enumerate(writer.pages):
     if idx > 0:
         width = float(page.mediabox.width)
         height = float(page.mediabox.height)
@@ -268,7 +269,6 @@ for idx, page in enumerate(reader.pages):
         packet.seek(0)
         overlay = PdfReader(packet).pages[0]
         page.merge_page(overlay)
-    writer.add_page(page)
 
 with open(pdf_path, "wb") as f:
     writer.write(f)
@@ -289,8 +289,8 @@ function Convert-HtmlToPdf {
     )
 
     $browserExe = Get-BrowserExecutable
-    Ensure-PythonModule -ModuleName "pypdf"
-    Ensure-PythonModule -ModuleName "reportlab"
+    Install-PythonModuleIfMissing -ModuleName "pypdf"
+    Install-PythonModuleIfMissing -ModuleName "reportlab"
 
     $pdfRoot = Join-Path $SiteRoot "pdf"
     if (-not (Test-Path $pdfRoot)) {
@@ -315,7 +315,7 @@ function Convert-HtmlToPdf {
                 New-Item -ItemType Directory -Path $pdfOutputDir -Force | Out-Null
             }
 
-            $originalHtml = Get-Content -Path $htmlPath -Raw
+            $originalHtml = Get-Content -Path $htmlPath -Raw -Encoding UTF8
             $forcedLightScript = @"
 <script>
   try { localStorage.setItem('theme', 'light'); } catch (e) {}
@@ -399,9 +399,9 @@ function Convert-HtmlToPdf {
             $tempHtml = $tempHtml -replace "(?i)</article>", ("</div>" + [Environment]::NewLine + "</article>")
             Set-Content -Path $htmlPath -Value $tempHtml -Encoding UTF8
 
-            $urlPath = Normalize-RelativePath $relativeHtml
+            $urlPath = ConvertTo-RelativePath $relativeHtml
             $url = "http://127.0.0.1:$($server.Port)/$urlPath"
-            Write-Host "Rendering browser PDF: $(Normalize-RelativePath $relativeHtml)"
+            Write-Host "Rendering browser PDF: $(ConvertTo-RelativePath $relativeHtml)"
 
             $chromeArgs = @(
                 "--headless=new",
@@ -440,7 +440,7 @@ function Convert-HtmlToPdf {
     }
 }
 
-function Insert-PdfLink {
+function Add-PdfLinkToHtml {
     param(
         [string]$HtmlPath,
         [string]$RelativePdfPath
@@ -450,7 +450,7 @@ function Insert-PdfLink {
         return
     }
 
-    $htmlText = Get-Content -Path $HtmlPath -Raw
+    $htmlText = Get-Content -Path $HtmlPath -Raw -Encoding UTF8
 
     $iconSvg = "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='24' height='24' aria-hidden='true'><path fill='#fff' d='M6 2h9l5 5v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z'/><path fill='#d32f2f' d='M15 2v5h5zM4 14h16v6H4z'/><path fill='#fff' d='M6.4 18.5h.9c.7 0 1.1-.3 1.1-.9 0-.6-.4-.9-1.1-.9h-.9v1.8zm0 .8V21H5.3v-5h2.1c1.3 0 2.1.6 2.1 1.7S8.7 19.4 7.4 19.4h-1zm4.7.8h-1.8v-5h1.8c1.5 0 2.5.9 2.5 2.5s-1 2.5-2.5 2.5zm-.7-.9h.6c.8 0 1.4-.5 1.4-1.6s-.6-1.6-1.4-1.6h-.6zm4 .9h-1.1v-5h3.1v.9h-2v1.2h1.8v.9h-1.8z'/></svg>"
     $iconData = "data:image/svg+xml,{0}" -f [System.Uri]::EscapeDataString($iconSvg)
@@ -488,7 +488,7 @@ function Insert-PdfLink {
     }
 }
 
-function Inject-PdfLinks {
+function Add-PdfLinksToHtml {
     param(
         [string]$Root,
         [string]$SiteRoot,
@@ -509,8 +509,8 @@ function Inject-PdfLinks {
 
         $htmlDir = Split-Path -Parent $htmlPath
         $relativePdfForLink = (Get-RelativePath -BasePath $htmlDir -TargetPath $sitePdfPath) -replace "\\", "/"
-        Insert-PdfLink -HtmlPath $htmlPath -RelativePdfPath $relativePdfForLink
-        Write-Host "Inserted link in: $(Normalize-RelativePath $relativeHtml)"
+        Add-PdfLinkToHtml -HtmlPath $htmlPath -RelativePdfPath $relativePdfForLink
+        Write-Host "Inserted link in: $(ConvertTo-RelativePath $relativeHtml)"
     }
 }
 
@@ -524,7 +524,7 @@ function Get-CombinedPdfFileName {
     }
 
     try {
-        $docfx = Get-Content -Path $docfxPath -Raw | ConvertFrom-Json
+        $docfx = Get-Content -Path $docfxPath -Raw -Encoding UTF8 | ConvertFrom-Json
         $name = $docfx.build.globalMetadata.pdfFileName
         if (-not [string]::IsNullOrWhiteSpace($name)) {
             return [string]$name
@@ -536,14 +536,14 @@ function Get-CombinedPdfFileName {
     return $defaultName
 }
 
-function Create-CombinedPdf {
+function New-CombinedPdf {
     param(
         [string]$Root,
         [string]$SiteRoot,
         [System.IO.FileInfo[]]$MarkdownFiles
     )
 
-    Ensure-PythonModule -ModuleName "pypdf"
+    Install-PythonModuleIfMissing -ModuleName "pypdf"
 
     $pdfRoot = Join-Path $SiteRoot "pdf"
     if (-not (Test-Path $pdfRoot)) {
@@ -574,7 +574,7 @@ function Create-CombinedPdf {
         $script = @"
 import os
 import sys
-from pypdf import PdfReader, PdfWriter
+from pypdf import PdfWriter
 
 list_path = sys.argv[1]
 out_path = sys.argv[2]
@@ -584,18 +584,20 @@ with open(list_path, "r", encoding="utf-8") as f:
     for line in f:
         p = line.strip()
         if p and os.path.exists(p):
-            reader = PdfReader(p)
-            for page in reader.pages:
-                writer.add_page(page)
+            try:
+                writer.append(p, import_outline=True)
+            except TypeError:
+                writer.append(p)
 
 with open(out_path, "wb") as out:
     writer.write(out)
 "@
-
         $script | python - $listPath $combinedPath
         if ($LASTEXITCODE -ne 0 -or -not (Test-Path $combinedPath)) {
             throw "Failed to create combined PDF: $combinedPath"
         }
+
+        Set-PdfOpenWithOutlinePane -PdfPath $combinedPath
 
         $targets = @(
             (Join-Path $SiteRoot $combinedName),
@@ -604,9 +606,10 @@ with open(out_path, "wb") as out:
 
         foreach ($target in $targets) {
             Copy-Item -Path $combinedPath -Destination $target -Force
+            Set-PdfOpenWithOutlinePane -PdfPath $target
         }
 
-        Write-Host "Created combined PDF: $(Normalize-RelativePath (Get-RelativePath -BasePath $SiteRoot -TargetPath $combinedPath))"
+        Write-Host "Created combined PDF: $(ConvertTo-RelativePath (Get-RelativePath -BasePath $SiteRoot -TargetPath $combinedPath))"
     }
     finally {
         if (Test-Path $listPath) {
@@ -625,14 +628,17 @@ if (-not $SkipBuild) {
 
 if (-not $SkipPdf) {
     Convert-HtmlToPdf -Root $repoRoot -SiteRoot $siteRoot -MarkdownFiles $markdownFiles -ReleaseInfo $releaseInfo
-    Create-CombinedPdf -Root $repoRoot -SiteRoot $siteRoot -MarkdownFiles $markdownFiles
+    New-CombinedPdf -Root $repoRoot -SiteRoot $siteRoot -MarkdownFiles $markdownFiles
 }
 
 if (-not $SkipInject) {
-    Inject-PdfLinks -Root $repoRoot -SiteRoot $siteRoot -MarkdownFiles $markdownFiles
+    Add-PdfLinksToHtml -Root $repoRoot -SiteRoot $siteRoot -MarkdownFiles $markdownFiles
 }
 
 Write-Host "Done."
+
+
+
 
 
 
