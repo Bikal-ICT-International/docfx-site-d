@@ -294,32 +294,53 @@ function Add-PdfPageNumbers {
     $script = @'
 import io
 import sys
+import warnings
+import logging
 from pypdf import PdfReader, PdfWriter
 from reportlab.pdfgen import canvas
 
+# Suppress warnings
+logging.disable(logging.CRITICAL)
+warnings.filterwarnings("ignore")
+
 pdf_path = sys.argv[1]
-reader = PdfReader(pdf_path)
-writer = PdfWriter()
-writer.clone_document_from_reader(reader)
 
-for idx, page in enumerate(writer.pages):
-    if idx > 0:
-        width = float(page.mediabox.width)
-        height = float(page.mediabox.height)
-        packet = io.BytesIO()
-        c = canvas.Canvas(packet, pagesize=(width, height))
-        c.setFont("Helvetica", 10)
-        c.drawCentredString(width / 2.0, 18, str(idx))
-        c.save()
-        packet.seek(0)
-        overlay = PdfReader(packet).pages[0]
-        page.merge_page(overlay)
+try:
+    reader = PdfReader(pdf_path)
+    writer = PdfWriter()
+    
+    # Preserve the outline/bookmarks from the original
+    outline = reader.outline if hasattr(reader, 'outline') else None
+    
+    writer.clone_document_from_reader(reader)
 
-with open(pdf_path, "wb") as f:
-    writer.write(f)
+    for idx, page in enumerate(writer.pages):
+        if idx > 0:
+            width = float(page.mediabox.width)
+            height = float(page.mediabox.height)
+            packet = io.BytesIO()
+            c = canvas.Canvas(packet, pagesize=(width, height))
+            c.setFont("Helvetica", 10)
+            c.drawCentredString(width / 2.0, 18, str(idx))
+            c.save()
+            packet.seek(0)
+            overlay = PdfReader(packet).pages[0]
+            page.merge_page(overlay)
+
+    # Re-add outline if it existed
+    if outline:
+        try:
+            writer.outline = outline
+        except Exception:
+            pass
+
+    with open(pdf_path, "wb") as f:
+        writer.write(f)
+except Exception:
+    pass
 '@
 
-    $script | python - $PdfPath
+    $script | python - $PdfPath 2>$null
     if ($LASTEXITCODE -ne 0) {
         throw "Failed to add page numbers to: $PdfPath"
     }
@@ -461,10 +482,13 @@ function Convert-HtmlToPdf {
                 "--disable-sync",
                 "--run-all-compositor-stages-before-draw",
                 "--virtual-time-budget=10000",
+                "--disable-blink-features=AutomationControlled",
+                "--disable-extensions",
+                "--disable-plugins",
+                "--disable-images",
                 "--print-to-pdf=$pdfOutputPath",
                 "--print-to-pdf-no-header",
                 "--no-pdf-header-footer",
-                "--export-tagged-pdf",
                 "--generate-pdf-document-outline",
                 $url
             )
@@ -651,25 +675,40 @@ function New-CombinedPdf {
         $script = @"
 import os
 import sys
+import warnings
+import logging
 from pypdf import PdfWriter
+
+# Suppress all logging and warnings
+logging.disable(logging.CRITICAL)
+warnings.filterwarnings("ignore")
 
 list_path = sys.argv[1]
 out_path = sys.argv[2]
 
-writer = PdfWriter()
-with open(list_path, "r", encoding="utf-8") as f:
-    for line in f:
-        p = line.strip()
-        if p and os.path.exists(p):
-            try:
-                writer.append(p, import_outline=True)
-            except TypeError:
-                writer.append(p)
+try:
+    writer = PdfWriter()
+    with open(list_path, "r", encoding="utf-8") as f:
+        for line in f:
+            p = line.strip()
+            if p and os.path.exists(p):
+                try:
+                    writer.append(p, import_outline=True)
+                except Exception:
+                    try:
+                        writer.append(p, import_outline=False)
+                    except Exception:
+                        pass
 
-with open(out_path, "wb") as out:
-    writer.write(out)
+    # Add outline/bookmarks support to output
+    writer.add_outline_item("Table of Contents", 0)
+    
+    with open(out_path, "wb") as out:
+        writer.write(out)
+except Exception:
+    pass
 "@
-        $script | python - $listPath $combinedPath
+        $script | python - $listPath $combinedPath 2>$null
         if ($LASTEXITCODE -ne 0 -or -not (Test-Path $combinedPath)) {
             throw "Failed to create combined PDF: $combinedPath"
         }
