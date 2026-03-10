@@ -27,7 +27,7 @@
   items:
     - name: Datalogger/Node Platform (DNP)
       href: dnp.md
-      
+
 - name: Test Documentation
   href: Test.md
 
@@ -37,11 +37,8 @@
 - name: New Product A Documentation
   href: NewProductA.md
 
-<<<<<<< HEAD
-=======
-- name: New Product C Documentation
-  href: NewProductC.md
-
->>>>>>> 5847bc7899c4b835aedd92b5c6ffc04a4a06df48
 - name: New Product B Documentation
   href: NewProductB.md
+
+- name: New Product C Documentation
+  href: NewProductC.md
