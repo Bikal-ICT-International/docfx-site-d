@@ -222,6 +222,7 @@ function Invoke-BrowserWithTimeout {
         [int]$TimeoutSeconds = 120
     )
 
+<<<<<<< HEAD
     $stdoutPath = [System.IO.Path]::GetTempFileName()
     $stderrPath = [System.IO.Path]::GetTempFileName()
 
@@ -229,6 +230,19 @@ function Invoke-BrowserWithTimeout {
         $proc = Start-Process -FilePath $BrowserExe -ArgumentList $Arguments -PassThru -RedirectStandardOutput $stdoutPath -RedirectStandardError $stderrPath
         $timedOut = $false
 
+=======
+    $proc = Start-Process -FilePath $BrowserExe -ArgumentList $Arguments -PassThru
+    $timedOut = $false
+
+    try {
+        Wait-Process -Id $proc.Id -Timeout $TimeoutSeconds -ErrorAction Stop
+    }
+    catch {
+        $timedOut = $true
+    }
+
+    if ($timedOut) {
+>>>>>>> 8af61eaef5f6e74ed294ba0992b404228ac986ac
         try {
             Wait-Process -Id $proc.Id -Timeout $TimeoutSeconds -ErrorAction Stop
         }
