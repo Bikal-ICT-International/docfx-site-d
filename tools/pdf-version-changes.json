@@ -1,0 +1,23 @@
+﻿{
+    "RunAt":  "2026-03-10T21:52:56+11:00",
+    "Changes":  [
+                    {
+                        "Path":  "Products\\MP406.md",
+                        "Status":  "new",
+                        "OldVersion":  null,
+                        "NewVersion":  "2.6.1"
+                    },
+                    {
+                        "Path":  "Products\\Nodes\\MFRNode.md",
+                        "Status":  "updated",
+                        "OldVersion":  "2.6.3",
+                        "NewVersion":  "2.6.4"
+                    },
+                    {
+                        "Path":  "Products\\Test.md",
+                        "Status":  "updated",
+                        "OldVersion":  "2.6.2",
+                        "NewVersion":  "2.6.3"
+                    }
+                ]
+}

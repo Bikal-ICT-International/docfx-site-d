@@ -1,4 +1,4 @@
-param(
+﻿param(
     [switch]$SkipPdf,
     [switch]$SkipBuild,
     [switch]$SkipInject
@@ -340,6 +340,52 @@ function Invoke-BrowserWithTimeout {
         if (Test-Path $stderrPath) { Remove-Item -Path $stderrPath -Force -ErrorAction SilentlyContinue }
     }
 }
+function Get-UsePlaywright {
+    $value = $env:USE_PLAYWRIGHT
+    if ([string]::IsNullOrWhiteSpace($value)) {
+        return $false
+    }
+
+    $value = $value.ToLowerInvariant()
+    return ($value -eq "1" -or $value -eq "true" -or $value -eq "yes")
+}
+
+function Ensure-PlaywrightAvailable {
+    $check = "import importlib.util,sys; sys.exit(0 if importlib.util.find_spec('playwright') else 1)"
+    & python -c $check
+    if ($LASTEXITCODE -ne 0) {
+        throw "Playwright is not installed. Install with: python -m pip install playwright; python -m playwright install chromium"
+    }
+}
+
+function Invoke-PlaywrightPdf {
+    param(
+        [string]$Url,
+        [string]$PdfPath,
+        [int]$TimeoutSeconds = 180
+    )
+
+    Ensure-PlaywrightAvailable
+
+    $script = @"
+import sys
+from playwright.sync_api import sync_playwright
+url = sys.argv[1]
+out_path = sys.argv[2]
+timeout_ms = int(sys.argv[3]) * 1000
+with sync_playwright() as p:
+    browser = p.chromium.launch()
+    page = browser.new_page()
+    page.goto(url, wait_until=\"networkidle\", timeout=timeout_ms)
+    page.pdf(path=out_path, print_background=True, prefer_css_page_size=True)
+    browser.close()
+"@
+
+    $script | python - $Url $PdfPath $TimeoutSeconds 2>$null
+    if ($LASTEXITCODE -ne 0) {
+        throw "Playwright PDF rendering failed for $Url"
+    }
+}
 function Set-PdfOpenWithOutlinePane {
     param([string]$PdfPath)
 
@@ -449,7 +495,10 @@ function Convert-HtmlToPdf {
     $versionState = Get-PdfVersionState -Root $Root
 
     $reportChanges = New-Object System.Collections.Generic.List[object]
-    $browserExe = Get-BrowserExecutable
+    $usePlaywright = Get-UsePlaywright
+    if (-not $usePlaywright) {
+        $browserExe = Get-BrowserExecutable
+    }
     Install-PythonModuleIfMissing -ModuleName "pypdf"
     Install-PythonModuleIfMissing -ModuleName "reportlab"
 
@@ -587,6 +636,22 @@ function Convert-HtmlToPdf {
             $urlPath = ConvertTo-RelativePath $relativeHtml
             $url = "http://127.0.0.1:$($server.Port)/$urlPath"
             Write-Host "Rendering browser PDF: $(ConvertTo-RelativePath $relativeHtml)"
+
+            if ($usePlaywright) {
+                try {
+                    Invoke-PlaywrightPdf -Url $url -PdfPath $pdfOutputPath -TimeoutSeconds 180
+                    Add-PdfPageNumbers -PdfPath $pdfOutputPath
+                    Set-PdfOpenWithOutlinePane -PdfPath $pdfOutputPath
+                }
+                catch {
+                    [void]$failedPdfPages.Add("${relativeHtml} :: $($_.Exception.Message)")
+                    Write-Warning "Skipping PDF for ${relativeHtml}: $($_.Exception.Message)"
+                }
+                finally {
+                    Set-Content -Path $htmlPath -Value $originalHtml -Encoding UTF8
+                }
+                continue
+            }
 
             $chromeArgs = @(
                 "--headless=new",
@@ -855,6 +920,13 @@ except Exception:
 }
 $repoRoot = Get-RepoRoot
 $siteRoot = Join-Path $repoRoot "_site"
+
+$updateTocScript = Join-Path $repoRoot "tools\update-toc.ps1"
+if (Test-Path $updateTocScript) {
+    Write-Host "Updating toc.yml from markdown files..."
+    & $updateTocScript -Root $repoRoot
+}
+
 $markdownFiles = Get-MarkdownFiles -Root $repoRoot
 
 if (-not $SkipBuild) {
@@ -871,6 +943,8 @@ if (-not $SkipInject) {
 }
 
 Write-Host "Done."
+
+
 
 
 
