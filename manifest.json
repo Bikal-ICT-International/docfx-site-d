@@ -22,6 +22,16 @@
     },
     {
       "type": "Conceptual",
+      "source_relative_path": "Products/NewProductA.md",
+      "output": {
+        ".html": {
+          "relative_path": "Products/NewProductA.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
       "source_relative_path": "Products/Nodes/ADNode.md",
       "output": {
         ".html": {
