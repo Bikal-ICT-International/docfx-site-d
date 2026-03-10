@@ -14,6 +14,11 @@
     "title": "New Product B | ictinternational.com",
     "summary": "New Product B This is a new Product B."
   },
+  "Products/NewProductC.html": {
+    "href": "Products/NewProductC.html",
+    "title": "New Product C | ictinternational.com",
+    "summary": "New Product C This is a new product C."
+  },
   "Products/Nodes/ADNode.html": {
     "href": "Products/Nodes/ADNode.html",
     "title": "About this document | ictinternational.com",

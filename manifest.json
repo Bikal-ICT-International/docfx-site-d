@@ -42,6 +42,16 @@
     },
     {
       "type": "Conceptual",
+      "source_relative_path": "Products/NewProductC.md",
+      "output": {
+        ".html": {
+          "relative_path": "Products/NewProductC.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
       "source_relative_path": "Products/Nodes/ADNode.md",
       "output": {
         ".html": {
