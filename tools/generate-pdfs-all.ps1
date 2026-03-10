@@ -1,4 +1,4 @@
-﻿param(
+param(
     [switch]$SkipPdf,
     [switch]$SkipBuild,
     [switch]$SkipInject
@@ -222,7 +222,6 @@ function Invoke-BrowserWithTimeout {
         [int]$TimeoutSeconds = 120
     )
 
-<<<<<<< HEAD
     $stdoutPath = [System.IO.Path]::GetTempFileName()
     $stderrPath = [System.IO.Path]::GetTempFileName()
 
@@ -230,19 +229,6 @@ function Invoke-BrowserWithTimeout {
         $proc = Start-Process -FilePath $BrowserExe -ArgumentList $Arguments -PassThru -RedirectStandardOutput $stdoutPath -RedirectStandardError $stderrPath
         $timedOut = $false
 
-=======
-    $proc = Start-Process -FilePath $BrowserExe -ArgumentList $Arguments -PassThru
-    $timedOut = $false
-
-    try {
-        Wait-Process -Id $proc.Id -Timeout $TimeoutSeconds -ErrorAction Stop
-    }
-    catch {
-        $timedOut = $true
-    }
-
-    if ($timedOut) {
->>>>>>> 8af61eaef5f6e74ed294ba0992b404228ac986ac
         try {
             Wait-Process -Id $proc.Id -Timeout $TimeoutSeconds -ErrorAction Stop
         }
@@ -262,7 +248,6 @@ function Invoke-BrowserWithTimeout {
         if (Test-Path $stderrPath) { Remove-Item -Path $stderrPath -Force -ErrorAction SilentlyContinue }
     }
 }
-
 function Set-PdfOpenWithOutlinePane {
     param([string]$PdfPath)
 
@@ -461,7 +446,7 @@ function Convert-HtmlToPdf {
 "@
             $coverHtml = @"
 <div class="pdf-cover">
-  <img class="pdf-cover-logo" src="/images/logo.svg" alt="ICT logo" />
+  <img class="pdf-cover-logo" src="/images/ICT logo.png" alt="ICT logo" />
   <h1>ICT International</h1>
   <h2>Product Support Documentation</h2>
   <div class="pdf-cover-meta">
@@ -766,6 +751,7 @@ if (-not $SkipInject) {
 }
 
 Write-Host "Done."
+
 
 
 
