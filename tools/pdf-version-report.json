@@ -101,6 +101,123 @@
                      "Changes":  [
 
                                  ]
+                 },
+                 {
+                     "RunAt":  "2026-03-10T23:14:39+11:00",
+                     "ReleaseDate":  "March 2026",
+                     "ChangedCount":  1,
+                     "Changes":  [
+                                     {
+                                         "Path":  "Products\\NewProductA.md",
+                                         "Status":  "new",
+                                         "OldVersion":  null,
+                                         "NewVersion":  "2.6.1",
+                                         "OldHash":  null,
+                                         "NewHash":  "798A15ADA37228D2360E87E5D36751D2DAD22FF3F539AD72624D5FAE2BCAC446"
+                                     }
+                                 ]
+                 },
+                 {
+                     "RunAt":  "2026-03-10T23:17:19+11:00",
+                     "ReleaseDate":  "March 2026",
+                     "ChangedCount":  0,
+                     "Changes":  [
+
+                                 ]
+                 },
+                 {
+                     "RunAt":  "2026-03-10T23:34:45+11:00",
+                     "ReleaseDate":  "March 2026",
+                     "ChangedCount":  1,
+                     "Changes":  [
+                                     {
+                                         "Path":  "Products\\New Product B.md",
+                                         "Status":  "new",
+                                         "OldVersion":  null,
+                                         "NewVersion":  "2.6.1",
+                                         "OldHash":  null,
+                                         "NewHash":  "27339BC2BC90A17BB27698A185BD19C7B173D9BAEE8B9B1900DE7C085F1295B0"
+                                     }
+                                 ]
+                 },
+                 {
+                     "RunAt":  "2026-03-10T23:36:59+11:00",
+                     "ReleaseDate":  "March 2026",
+                     "ChangedCount":  1,
+                     "Changes":  [
+                                     {
+                                         "Path":  "Products\\NewProductB.md",
+                                         "Status":  "new",
+                                         "OldVersion":  null,
+                                         "NewVersion":  "2.6.1",
+                                         "OldHash":  null,
+                                         "NewHash":  "27339BC2BC90A17BB27698A185BD19C7B173D9BAEE8B9B1900DE7C085F1295B0"
+                                     }
+                                 ]
+                 },
+                 {
+                     "RunAt":  "2026-03-10T23:44:01+11:00",
+                     "ReleaseDate":  "March 2026",
+                     "ChangedCount":  0,
+                     "Changes":  [
+
+                                 ]
+                 },
+                 {
+                     "RunAt":  "2026-03-10T23:48:10+11:00",
+                     "ReleaseDate":  "March 2026",
+                     "ChangedCount":  0,
+                     "Changes":  [
+
+                                 ]
+                 },
+                 {
+                     "RunAt":  "2026-03-10T23:53:11+11:00",
+                     "ReleaseDate":  "March 2026",
+                     "ChangedCount":  0,
+                     "Changes":  [
+
+                                 ]
+                 },
+                 {
+                     "RunAt":  "2026-03-11T09:36:59+11:00",
+                     "ReleaseDate":  "March 2026",
+                     "ChangedCount":  0,
+                     "Changes":  [
+
+                                 ]
+                 },
+                 {
+                     "RunAt":  "2026-03-11T09:45:56+11:00",
+                     "ReleaseDate":  "March 2026",
+                     "ChangedCount":  0,
+                     "Changes":  [
+
+                                 ]
+                 },
+                 {
+                     "RunAt":  "2026-03-11T09:46:54+11:00",
+                     "ReleaseDate":  "March 2026",
+                     "ChangedCount":  0,
+                     "Changes":  [
+
+                                 ]
+                 },
+                 {
+                     "RunAt":  "2026-03-11T09:50:30+11:00",
+                     "ReleaseDate":  "March 2026",
+                     "ChangedCount":  0,
+                     "Changes":  [
+
+                                 ]
+                 },
+                 {
+                     "RunAt":  "2026-03-11T09:56:49+11:00",
+                     "ReleaseDate":  "March 2026",
+                     "ChangedCount":  0,
+                     "Changes":  [
+
+                                 ]
                  }
              ]
 }

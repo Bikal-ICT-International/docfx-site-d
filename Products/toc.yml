@@ -36,3 +36,6 @@
 
 - name: New Product A Documentation
   href: NewProductA.md
+
+- name: New Product B Documentation
+  href: NewProductB.md

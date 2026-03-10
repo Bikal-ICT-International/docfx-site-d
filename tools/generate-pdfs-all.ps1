@@ -374,16 +374,25 @@ url = sys.argv[1]
 out_path = sys.argv[2]
 timeout_ms = int(sys.argv[3]) * 1000
 with sync_playwright() as p:
-    browser = p.chromium.launch()
+    browser = p.chromium.launch(args=["--disable-dev-shm-usage"])
     page = browser.new_page()
-    page.goto(url, wait_until=\"networkidle\", timeout=timeout_ms)
+    page.set_default_timeout(timeout_ms)
+    page.goto(url, wait_until="load", timeout=timeout_ms)
+    try:
+        page.wait_for_load_state("networkidle", timeout=5000)
+    except Exception:
+        pass
     page.pdf(path=out_path, print_background=True, prefer_css_page_size=True)
     browser.close()
 "@
 
-    $script | python - $Url $PdfPath $TimeoutSeconds 2>$null
+    $output = $script | python - $Url $PdfPath $TimeoutSeconds 2>&1
     if ($LASTEXITCODE -ne 0) {
-        throw "Playwright PDF rendering failed for $Url"
+        $msg = ($output -join " ").Trim()
+        if ([string]::IsNullOrWhiteSpace($msg)) {
+            $msg = "No error output from Playwright."
+        }
+        throw ("Playwright PDF rendering failed for {0}. {1}" -f $Url, $msg)
     }
 }
 function Set-PdfOpenWithOutlinePane {
@@ -774,6 +783,20 @@ function Add-PdfLinkToHtml {
     }
 }
 
+function Remove-PdfLinkFromHtml {
+    param([string]$HtmlPath)
+
+    if (-not (Test-Path $HtmlPath)) {
+        return
+    }
+
+    $htmlText = Get-Content -Path $HtmlPath -Raw -Encoding UTF8
+    $downloadBlockPattern = "(?is)<p\s+class=""pdf-download""[^>]*>.*?</p>"
+    if ($htmlText -match $downloadBlockPattern) {
+        $newHtml = [System.Text.RegularExpressions.Regex]::Replace($htmlText, $downloadBlockPattern, "", 1)
+        Set-Content -Path $HtmlPath -Value $newHtml -Encoding UTF8
+    }
+}
 function Add-PdfLinksToHtml {
     param(
         [string]$Root,
@@ -943,6 +966,8 @@ if (-not $SkipInject) {
 }
 
 Write-Host "Done."
+
+
 
 
 

@@ -1,25 +1,3 @@
 ﻿- name: Product Support Documentation
-  items:
-    - name: dnp Documentation
-      href: Products/dnp.md
-    - name: MP406 Documentation
-      href: Products/MP406.md
-    - name: ADNode Documentation
-      href: Products/Nodes/ADNode.md
-    - name: MFRNode Documentation
-      href: Products/Nodes/MFRNode.md
-    - name: SNode Documentation
-      href: Products/Nodes/SNode.md
-    - name: PSY1 Documentation
-      href: Products/Psychrometer/PSY1.md
-    - name: PSY1x Documentation
-      href: Products/Psychrometer/PSY1x.md
-    - name: sapflowsensor Documentation
-      href: Products/sapflowsensor.md
-    - name: SFM1 Documentation
-      href: Products/SFM1.md
-    - name: SFM1X Documentation
-      href: Products/SFM1X.md
-    - name: Test Documentation
-      href: Products/Test.md
+  href: Products/Nodes/ADNode.md
 
