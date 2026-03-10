@@ -1,0 +1,35 @@
+﻿{
+    "Runs":  [
+                 {
+                     "RunAt":  "2026-03-10T19:22:54+11:00",
+                     "ReleaseDate":  "March 2026",
+                     "ChangedCount":  0,
+                     "Changes":  [
+
+                                 ]
+                 },
+                 {
+                     "RunAt":  "2026-03-10T19:24:24+11:00",
+                     "ReleaseDate":  "March 2026",
+                     "ChangedCount":  1,
+                     "Changes":  [
+                                     {
+                                         "Path":  "Products\\Test.md",
+                                         "Status":  "updated",
+                                         "OldVersion":  "2.6.1",
+                                         "NewVersion":  "2.6.2",
+                                         "OldHash":  "FD643B7BC1B2909126118C3ECB8C4A3D8084E9A4F40473AB938FB8F793575044",
+                                         "NewHash":  "8C649DE0A127C30E7A9872CB3FB11A425DE8F4C887CF65CC7252229B41BA1651"
+                                     }
+                                 ]
+                 },
+                 {
+                     "RunAt":  "2026-03-10T20:35:11+11:00",
+                     "ReleaseDate":  "March 2026",
+                     "ChangedCount":  0,
+                     "Changes":  [
+
+                                 ]
+                 }
+             ]
+}

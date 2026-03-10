@@ -1,9 +1,55 @@
 ﻿{
-    "Version":  "2.6.2",
-    "ContentHash":  "ab0f3d14346bee038921e1e9e498ba8b0e837a255e0acdb1dfdde428fc0ddedd",
-<<<<<<< HEAD
-    "UpdatedAt":  "2026-03-10T12:18:10+11:00"
-=======
-    "UpdatedAt":  "2026-03-10T10:28:52+11:00"
->>>>>>> 8af61eaef5f6e74ed294ba0992b404228ac986ac
+    "Files":  {
+                  "Products\\Nodes\\ADNode.md":  {
+                                                     "Version":  "2.6.1",
+                                                     "ContentHash":  "7A1C969805AEE6BFE59F68671D34998515FAD4443D686E51F0896A26BB500453",
+                                                     "UpdatedAt":  "2026-03-10T20:34:58+11:00"
+                                                 },
+                  "Products\\Nodes\\SNode.md":  {
+                                                    "Version":  "2.6.1",
+                                                    "ContentHash":  "3CDAC44290391E6E783DF3BAF95B2703030C1883B250E9A593C94BB16C390C4B",
+                                                    "UpdatedAt":  "2026-03-10T20:35:03+11:00"
+                                                },
+                  "Products\\sapflowsensor.md":  {
+                                                     "Version":  "2.6.1",
+                                                     "ContentHash":  "CF477F22743F0DA8F267F5EB4FDE5EFCBF2AF4DC92E8F6B3DB8E7053C99B4590",
+                                                     "UpdatedAt":  "2026-03-10T20:34:49+11:00"
+                                                 },
+                  "Products\\Psychrometer\\PSY1.md":  {
+                                                          "Version":  "2.6.1",
+                                                          "ContentHash":  "173E1ED68D4C063A799DC843DF1045B99CF769ACD9B13C5F4F9C9CF8BC1B32A1",
+                                                          "UpdatedAt":  "2026-03-10T20:35:05+11:00"
+                                                      },
+                  "Products\\Psychrometer\\PSY1x.md":  {
+                                                           "Version":  "2.6.1",
+                                                           "ContentHash":  "57B5C610935F8CDF3204F050E83039F47F851AE72B8165DC68A06E7580557C66",
+                                                           "UpdatedAt":  "2026-03-10T20:35:08+11:00"
+                                                       },
+                  "Products\\SFM1.md":  {
+                                            "Version":  "2.6.1",
+                                            "ContentHash":  "22999EF077A7BCAF7D2149D5CA35A49F745D6BE534A28CEC2C586F50A2D37E75",
+                                            "UpdatedAt":  "2026-03-10T20:34:51+11:00"
+                                        },
+                  "Products\\Nodes\\MFRNode.md":  {
+                                                      "Version":  "2.6.3",
+                                                      "ContentHash":  "C3AC107EA03845FF5A3CD24AC1DE9938A4910991CA28F694E8D1825302A1CFA7",
+                                                      "UpdatedAt":  "2026-03-10T20:35:00+11:00"
+                                                  },
+                  "Products\\Test.md":  {
+                                            "Version":  "2.6.2",
+                                            "ContentHash":  "8C649DE0A127C30E7A9872CB3FB11A425DE8F4C887CF65CC7252229B41BA1651",
+                                            "UpdatedAt":  "2026-03-10T20:34:56+11:00"
+                                        },
+                  "Products\\SFM1X.md":  {
+                                             "Version":  "2.6.1",
+                                             "ContentHash":  "FE3046045FE2256944CADDC8C49AB93EC71DA093DEE93A2B3FE3A01282334F20",
+                                             "UpdatedAt":  "2026-03-10T20:34:54+11:00"
+                                         },
+                  "Products\\dnp.md":  {
+                                           "Version":  "2.6.1",
+                                           "ContentHash":  "9B6CE22DDE64D823751051E477EFE93F530DF8A264723456276E907B926C1E21",
+                                           "UpdatedAt":  "2026-03-10T20:34:47+11:00"
+                                       }
+              },
+    "UpdatedAt":  "2026-03-10T20:35:11+11:00"
 }
