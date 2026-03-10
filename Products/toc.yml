@@ -31,6 +31,8 @@
 - name: Test Documentation
   href: Test.md
 
-- name: MP406
+- name: MP406 Documentation
   href: MP406.md
 
+- name: New Product A Documentation
+  href: NewProductA.md
