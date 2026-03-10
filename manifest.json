@@ -12,6 +12,16 @@
     },
     {
       "type": "Conceptual",
+      "source_relative_path": "Products/MP406.md",
+      "output": {
+        ".html": {
+          "relative_path": "Products/MP406.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
       "source_relative_path": "Products/Nodes/ADNode.md",
       "output": {
         ".html": {
@@ -119,6 +129,16 @@
         },
         ".json": {
           "relative_path": "Products/toc.json"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "images/ICT logo.png",
+      "output": {
+        "resource": {
+          "relative_path": "images/ICT logo.png"
         }
       },
       "version": ""
