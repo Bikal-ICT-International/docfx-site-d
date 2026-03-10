@@ -5,7 +5,6 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
-
 function Get-RepoRoot {
     $scriptDir = Split-Path -Parent $PSScriptRoot
     if ([string]::IsNullOrWhiteSpace($scriptDir)) {
@@ -95,51 +94,144 @@ function Get-MarkdownContentHash {
     return ([System.BitConverter]::ToString($result)).Replace("-", "").ToLowerInvariant()
 }
 
-function Get-ReleaseInfo {
+function Get-PdfVersionState {
     param([string]$Root)
 
     $statePath = Join-Path $Root "tools\pdf-version-state.json"
-    $currentHash = Get-MarkdownContentHash -Root $Root
-    $baseVersion = "2.6.1"
-    $versionToUse = $baseVersion
-    $state = $null
+    $state = [PSCustomObject]@{
+        Files = @{}
+    }
 
     if (Test-Path $statePath) {
-        $raw = Get-Content -Path $statePath -Raw -Encoding UTF8
-        if (-not [string]::IsNullOrWhiteSpace($raw)) {
-            $state = $raw | ConvertFrom-Json
+        try {
+            $raw = Get-Content -Path $statePath -Raw -Encoding UTF8
+            if (-not [string]::IsNullOrWhiteSpace($raw)) {
+                $parsed = $raw | ConvertFrom-Json
+                if ($parsed -and $parsed.Files) {
+                    $files = @{}
+                    foreach ($prop in $parsed.Files.PSObject.Properties) {
+                        $files[$prop.Name] = $prop.Value
+                    }
+                    $state.Files = $files
+                }
+            }
+        }
+        catch {
         }
     }
 
-    if ($state -and $state.Version) {
-        $versionToUse = [string]$state.Version
-        if ($state.ContentHash -ne $currentHash) {
-            $parts = $versionToUse.Split(".")
-            if ($parts.Length -eq 3) {
-                $major = [int]$parts[0]
-                $minor = [int]$parts[1]
-                $patch = [int]$parts[2] + 1
-                $versionToUse = "$major.$minor.$patch"
-            }
-            else {
-                $versionToUse = $baseVersion
-            }
-        }
+    return $state
+}
+
+function Get-NextPatchVersion {
+    param(
+        [string]$Version,
+        [string]$FallbackVersion
+    )
+
+    $parts = $Version.Split(".")
+    if ($parts.Length -eq 3 -and ($parts | Where-Object { $_ -match '^\d+$' }).Count -eq 3) {
+        $major = [int]$parts[0]
+        $minor = [int]$parts[1]
+        $patch = [int]$parts[2] + 1
+        return "$major.$minor.$patch"
     }
 
-    $newState = [PSCustomObject]@{
+    return $FallbackVersion
+}
+
+function Update-PdfVersionStateForFile {
+    param(
+        [pscustomobject]$State,
+        [string]$RelativePath,
+        [string]$FileHash,
+        [string]$BaseVersion,
+        [string]$ReleaseDate
+    )
+
+    $files = $State.Files
+    $entry = $null
+    if ($files.ContainsKey($RelativePath)) {
+        $entry = $files[$RelativePath]
+    }
+
+    $versionToUse = $BaseVersion
+    if ($entry -and $entry.Version) {
+        $versionToUse = [string]$entry.Version
+    }
+
+    if (-not $entry) {
+        $versionToUse = $BaseVersion
+    }
+    elseif ($entry.ContentHash -ne $FileHash) {
+        $versionToUse = Get-NextPatchVersion -Version $versionToUse -FallbackVersion $BaseVersion
+    }
+
+    $files[$RelativePath] = [PSCustomObject]@{
         Version = $versionToUse
-        ContentHash = $currentHash
+        ContentHash = $FileHash
         UpdatedAt = (Get-Date).ToString("yyyy-MM-ddTHH:mm:ssK")
     }
-    $newState | ConvertTo-Json | Set-Content -Path $statePath -Encoding UTF8
 
     return [PSCustomObject]@{
         Version = $versionToUse
-        ReleaseDate = "March 2026"
+        ReleaseDate = $ReleaseDate
     }
 }
 
+function Save-PdfVersionState {
+    param(
+        [string]$Root,
+        [pscustomobject]$State
+    )
+
+    $statePath = Join-Path $Root "tools\pdf-version-state.json"
+    $stateOut = [PSCustomObject]@{
+        Files = [PSCustomObject]$State.Files
+        UpdatedAt = (Get-Date).ToString("yyyy-MM-ddTHH:mm:ssK")
+    }
+    $stateOut | ConvertTo-Json -Depth 6 | Set-Content -Path $statePath -Encoding UTF8
+}
+function Save-PdfVersionReport {
+    param(
+        [string]$Root,
+        [string]$ReleaseDate,
+        [System.Collections.IEnumerable]$Changes
+    )
+
+    $reportPath = Join-Path $Root "tools\pdf-version-report.json"
+    $run = [PSCustomObject]@{
+        RunAt = (Get-Date).ToString("yyyy-MM-ddTHH:mm:ssK")
+        ReleaseDate = $ReleaseDate
+        ChangedCount = @($Changes).Count
+        Changes = @($Changes)
+    }
+
+    $report = [PSCustomObject]@{
+        Runs = @($run)
+    }
+
+    if (Test-Path $reportPath) {
+        try {
+            $raw = Get-Content -Path $reportPath -Raw -Encoding UTF8
+            if (-not [string]::IsNullOrWhiteSpace($raw)) {
+                $existing = $raw | ConvertFrom-Json
+                if ($existing -and $existing.Runs) {
+                    $runs = @()
+                    foreach ($item in $existing.Runs) {
+                        $runs += $item
+                    }
+                    $runs += $run
+                    $report = [PSCustomObject]@{ Runs = $runs }
+                }
+            }
+        }
+        catch {
+        }
+    }
+
+    $report | ConvertTo-Json -Depth 6 | Set-Content -Path $reportPath -Encoding UTF8
+}
 function Invoke-DocFxBuild {
     param([string]$Root)
 
@@ -349,10 +441,14 @@ function Convert-HtmlToPdf {
     param(
         [string]$Root,
         [string]$SiteRoot,
-        [System.IO.FileInfo[]]$MarkdownFiles,
-        [pscustomobject]$ReleaseInfo
+        [System.IO.FileInfo[]]$MarkdownFiles
     )
 
+    $baseVersion = "2.6.1"
+    $releaseDate = "March 2026"
+    $versionState = Get-PdfVersionState -Root $Root
+
+    $reportChanges = New-Object System.Collections.Generic.List[object]
     $browserExe = Get-BrowserExecutable
     Install-PythonModuleIfMissing -ModuleName "pypdf"
     Install-PythonModuleIfMissing -ModuleName "reportlab"
@@ -367,6 +463,29 @@ function Convert-HtmlToPdf {
     try {
         foreach ($md in $MarkdownFiles) {
             $relativeMd = Get-RelativePath -BasePath $Root -TargetPath $md.FullName
+            $existingEntry = $null
+            if ($versionState.Files.ContainsKey($relativeMd)) {
+                $existingEntry = $versionState.Files[$relativeMd]
+            }
+            $oldVersion = $null
+            $oldHash = $null
+            if ($existingEntry) {
+                $oldVersion = $existingEntry.Version
+                $oldHash = $existingEntry.ContentHash
+            }
+            $fileHash = (Get-FileHash -Algorithm SHA256 -Path $md.FullName).Hash
+            $releaseInfo = Update-PdfVersionStateForFile -State $versionState -RelativePath $relativeMd -FileHash $fileHash -BaseVersion $baseVersion -ReleaseDate $releaseDate
+            if (-not $existingEntry -or $oldHash -ne $fileHash) {
+                $status = if ($existingEntry) { "updated" } else { "new" }
+                [void]$reportChanges.Add([PSCustomObject]@{
+                    Path = $relativeMd
+                    Status = $status
+                    OldVersion = $oldVersion
+                    NewVersion = $releaseInfo.Version
+                    OldHash = $oldHash
+                    NewHash = $fileHash
+                })
+            }
             $relativeHtml = [System.IO.Path]::ChangeExtension($relativeMd, ".html")
             $relativePdf = [System.IO.Path]::ChangeExtension($relativeMd, ".pdf")
             $htmlPath = Join-Path $SiteRoot $relativeHtml
@@ -538,6 +657,8 @@ function Convert-HtmlToPdf {
             }
         }
     }
+    Save-PdfVersionState -Root $Root -State $versionState
+    Save-PdfVersionReport -Root $Root -ReleaseDate $releaseDate -Changes $reportChanges
 }
 
 function Add-PdfLinkToHtml {
@@ -735,14 +856,13 @@ except Exception:
 $repoRoot = Get-RepoRoot
 $siteRoot = Join-Path $repoRoot "_site"
 $markdownFiles = Get-MarkdownFiles -Root $repoRoot
-$releaseInfo = Get-ReleaseInfo -Root $repoRoot
 
 if (-not $SkipBuild) {
     Invoke-DocFxBuild -Root $repoRoot
 }
 
 if (-not $SkipPdf) {
-    Convert-HtmlToPdf -Root $repoRoot -SiteRoot $siteRoot -MarkdownFiles $markdownFiles -ReleaseInfo $releaseInfo
+    Convert-HtmlToPdf -Root $repoRoot -SiteRoot $siteRoot -MarkdownFiles $markdownFiles
     New-CombinedPdf -Root $repoRoot -SiteRoot $siteRoot -MarkdownFiles $markdownFiles
 }
 
@@ -751,8 +871,6 @@ if (-not $SkipInject) {
 }
 
 Write-Host "Done."
-
-
 
 
 

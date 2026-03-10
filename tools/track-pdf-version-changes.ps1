@@ -1,4 +1,4 @@
-﻿param(
+param(
     [string]$Root = (Split-Path -Parent $PSScriptRoot)
 )
 
@@ -129,6 +129,9 @@ else {
     }
 }
 
+$snapshotPath = Save-Snapshot -SnapshotDir $snapshotDir -State $currentState
+Write-Host "Snapshot saved to: $snapshotPath"
+
 $changesReportPath = Join-Path $Root "tools\pdf-version-changes.json"
 $changesReport = [PSCustomObject]@{
     RunAt = (Get-Date).ToString("yyyy-MM-ddTHH:mm:ssK")
@@ -136,6 +139,3 @@ $changesReport = [PSCustomObject]@{
 }
 $changesReport | ConvertTo-Json -Depth 6 | Set-Content -Path $changesReportPath -Encoding UTF8
 Write-Host "Changes JSON saved to: $changesReportPath"
-
-$snapshotPath = Save-Snapshot -SnapshotDir $snapshotDir -State $currentState
-Write-Host "Snapshot saved to: $snapshotPath"
