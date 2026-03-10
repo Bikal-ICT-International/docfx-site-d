@@ -1,5 +1,5 @@
 {
-  "source_base_path": "F:/docfx-site-d",
+  "source_base_path": "/home/runner/work/docfx-site-d/docfx-site-d",
   "xrefmap": "xrefmap.yml",
   "files": [
     {
@@ -26,6 +26,16 @@
       "output": {
         ".html": {
           "relative_path": "Products/NewProductA.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "Products/NewProductB.md",
+      "output": {
+        ".html": {
+          "relative_path": "Products/NewProductB.html"
         }
       },
       "version": ""
