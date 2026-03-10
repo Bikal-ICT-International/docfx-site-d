@@ -82,6 +82,16 @@
     },
     {
       "type": "Conceptual",
+      "source_relative_path": "Products/Test.md",
+      "output": {
+        ".html": {
+          "relative_path": "Products/Test.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
       "source_relative_path": "Products/dnp.md",
       "output": {
         ".html": {
