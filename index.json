@@ -12,7 +12,17 @@
   "Products/NewProductB.html": {
     "href": "Products/NewProductB.html",
     "title": "New Product B | ictinternational.com",
-    "summary": "New Product B This is a new product B."
+    "summary": "New Product B This is a new Product B. Added another line."
+  },
+  "Products/NewProductC.html": {
+    "href": "Products/NewProductC.html",
+    "title": "New Product C | ictinternational.com",
+    "summary": "New Product C This is a new product C."
+  },
+  "Products/NewProductD.html": {
+    "href": "Products/NewProductD.html",
+    "title": "New Product D | ictinternational.com",
+    "summary": "New Product D This is a new product D."
   },
   "Products/Nodes/ADNode.html": {
     "href": "Products/Nodes/ADNode.html",
@@ -52,7 +62,7 @@
   "Products/Test.html": {
     "href": "Products/Test.html",
     "title": "Test | ictinternational.com",
-    "summary": "Test Added and edited this file on GitHub web to test the deployment. Bug fixed for CI pipeline for the failure to create pdf for this file. Bug fixed for CI pipeline for pdf rendering and toc.yml. Fixed to stabilize PDF render in GitHub Actions corrected PDF browser timeout detection to avoid false timeout failures 11:01"
+    "summary": "Test Added and edited this file on GitHub web to test the deployment. Bug fixed for CI pipeline for the failure to create pdf for this file. Bug fixed for CI pipeline for pdf rendering and toc.yml. Fixed to stabilize PDF render in GitHub Actions corrected PDF browser timeout detection to avoid false timeout failures 11:01 added test"
   },
   "Products/dnp.html": {
     "href": "Products/dnp.html",

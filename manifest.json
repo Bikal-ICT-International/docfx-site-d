@@ -42,6 +42,26 @@
     },
     {
       "type": "Conceptual",
+      "source_relative_path": "Products/NewProductC.md",
+      "output": {
+        ".html": {
+          "relative_path": "Products/NewProductC.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "Products/NewProductD.md",
+      "output": {
+        ".html": {
+          "relative_path": "Products/NewProductD.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
       "source_relative_path": "Products/Nodes/ADNode.md",
       "output": {
         ".html": {
@@ -199,6 +219,16 @@
       "output": {
         "resource": {
           "relative_path": "images/logo.svg"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "images/logo1.svg",
+      "output": {
+        "resource": {
+          "relative_path": "images/logo1.svg"
         }
       },
       "version": ""
