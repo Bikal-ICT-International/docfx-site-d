@@ -218,6 +218,83 @@
                      "Changes":  [
 
                                  ]
+                 },
+                 {
+                     "RunAt":  "2026-03-11T11:42:41+11:00",
+                     "ReleaseDate":  "March 2026",
+                     "ChangedCount":  3,
+                     "Changes":  [
+                                     {
+                                         "Path":  "Products\\NewProductB.md",
+                                         "Status":  "updated",
+                                         "OldVersion":  "2.6.1",
+                                         "NewVersion":  "2.6.2",
+                                         "OldHash":  "27339BC2BC90A17BB27698A185BD19C7B173D9BAEE8B9B1900DE7C085F1295B0",
+                                         "NewHash":  "FB279ABA01246BC78048AFEDD0EBF4053A56A679EC19C74DDB4DDB515B37D79B"
+                                     },
+                                     {
+                                         "Path":  "Products\\NewProductC.md",
+                                         "Status":  "new",
+                                         "OldVersion":  null,
+                                         "NewVersion":  "2.6.1",
+                                         "OldHash":  null,
+                                         "NewHash":  "F5C69645D32D101EDD3B7C72F3A2EE644A498CFA9A8A6BBFAB9CB1B4C70E4CC4"
+                                     },
+                                     {
+                                         "Path":  "Products\\Test.md",
+                                         "Status":  "updated",
+                                         "OldVersion":  "2.6.3",
+                                         "NewVersion":  "2.6.4",
+                                         "OldHash":  "050502E1E3C05B839DACA6322B539E52F033C1DD3702D7A69D33F3B913570ACB",
+                                         "NewHash":  "344F536309DC3A8D13FFB7EDC9485D6FAF276802D6BCABFC6C52FA8986F21992"
+                                     }
+                                 ]
+                 },
+                 {
+                     "RunAt":  "2026-03-11T11:49:18+11:00",
+                     "ReleaseDate":  "March 2026",
+                     "ChangedCount":  1,
+                     "Changes":  [
+                                     {
+                                         "Path":  "Products\\NewProductB.md",
+                                         "Status":  "updated",
+                                         "OldVersion":  "2.6.2",
+                                         "NewVersion":  "2.6.3",
+                                         "OldHash":  "FB279ABA01246BC78048AFEDD0EBF4053A56A679EC19C74DDB4DDB515B37D79B",
+                                         "NewHash":  "D812B9C595EE060C8DDE8558B32CCE5FB16D5BCE644AB0D7D65A55AF27416C7F"
+                                     }
+                                 ]
+                 },
+                 {
+                     "RunAt":  "2026-03-11T12:01:19+11:00",
+                     "ReleaseDate":  "March 2026",
+                     "ChangedCount":  0,
+                     "Changes":  [
+
+                                 ]
+                 },
+                 {
+                     "RunAt":  "2026-03-15T22:47:26+11:00",
+                     "ReleaseDate":  "March 2026",
+                     "ChangedCount":  0,
+                     "Changes":  [
+
+                                 ]
+                 },
+                 {
+                     "RunAt":  "2026-03-15T22:52:09+11:00",
+                     "ReleaseDate":  "March 2026",
+                     "ChangedCount":  1,
+                     "Changes":  [
+                                     {
+                                         "Path":  "Products\\NewProductD.md",
+                                         "Status":  "new",
+                                         "OldVersion":  null,
+                                         "NewVersion":  "2.6.1",
+                                         "OldHash":  null,
+                                         "NewHash":  "19D50D106D3FF85CA605EAA744B1078DBC58B7CB120E598E3FD4E08C07932A39"
+                                     }
+                                 ]
                  }
              ]
 }

@@ -42,3 +42,6 @@
 
 - name: New Product C Documentation
   href: NewProductC.md
+
+- name: New Product D Documentation
+  href: NewProductD.md

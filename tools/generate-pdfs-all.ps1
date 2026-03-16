@@ -731,7 +731,8 @@ function Convert-HtmlToPdf {
             }
         }
     }
-    Save-PdfVersionState -Root $Root -State $versionState
+    Save-PdfVersionState -Root $Root -State $versionState
+
     Save-PdfVersionReport -Root $Root -ReleaseDate $releaseDate -Changes $reportChanges
 }
 
@@ -797,6 +798,40 @@ function Remove-PdfLinkFromHtml {
         Set-Content -Path $HtmlPath -Value $newHtml -Encoding UTF8
     }
 }
+function Add-SecurityMetaToHtml {
+    param([string]$SiteRoot)
+
+    if (-not (Test-Path $SiteRoot)) {
+        return
+    }
+
+    $csp = "default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'self'; upgrade-insecure-requests"
+    $referrer = "strict-origin-when-cross-origin"
+
+    $metaCsp = '<meta http-equiv="Content-Security-Policy" content="{0}">' -f $csp
+    $metaRef = '<meta http-equiv="Referrer-Policy" content="{0}">' -f $referrer
+
+    $htmlFiles = Get-ChildItem -Path $SiteRoot -Recurse -File -Filter "*.html" |
+        Where-Object { $_.FullName -notmatch '[\\/](public|pdf)[\\/]' }
+
+    foreach ($file in $htmlFiles) {
+        $html = Get-Content -Path $file.FullName -Raw -Encoding UTF8
+        if ([string]::IsNullOrWhiteSpace($html)) {
+            continue
+        }
+
+        $html = [System.Text.RegularExpressions.Regex]::Replace($html, "(?is)<meta[^>]+http-equiv=[`"']Content-Security-Policy[`"'][^>]*>\s*", '')
+        $html = [System.Text.RegularExpressions.Regex]::Replace($html, "(?is)<meta[^>]+http-equiv=[`"']Referrer-Policy[`"'][^>]*>\s*", '')
+        $html = [System.Text.RegularExpressions.Regex]::Replace($html, "(?is)<meta[^>]+name=[`"']referrer[`"'][^>]*>\s*", '')
+
+        if ($html -match '(?i)<head>') {
+            $inject = "<head>" + [Environment]::NewLine + "    " + $metaCsp + [Environment]::NewLine + "    " + $metaRef
+            $html = [System.Text.RegularExpressions.Regex]::Replace($html, '(?i)<head>', $inject, 1)
+            Set-Content -Path $file.FullName -Value $html -Encoding UTF8
+        }
+    }
+}
+
 function Add-PdfLinksToHtml {
     param(
         [string]$Root,
@@ -964,6 +999,8 @@ if (-not $SkipPdf) {
 if (-not $SkipInject) {
     Add-PdfLinksToHtml -Root $repoRoot -SiteRoot $siteRoot -MarkdownFiles $markdownFiles
 }
+
+Add-SecurityMetaToHtml -SiteRoot $siteRoot
 
 Write-Host "Done."
 
