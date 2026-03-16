@@ -266,3 +266,7 @@ Here is the final Markdown written exactly as it should appear:
     <td>MPM160</td>
   </tr>
 </table>
+
+
+
+![ICT logo](sapflow.jpg)
